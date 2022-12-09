@@ -30,17 +30,45 @@ def game(trees, verbose=False):
     count_trees += (max_height * 2) + ( (max_width -2) * 2)
     return count_trees
 
-def game2(directories, verbose=False):
-    min_space = 30000000
-    spaces = []
-    for d in directories:
-        size = d.size_of()
-        calc_space = min_space - size
-        if calc_space >0:
-            spaces.append((calc_space, size))
-
-    spaces.sort(key=lambda a: a[0])
-    return spaces[0]
+def game2(trees, verbose=False):
+    count_trees = 0
+    max_height,max_width = np.shape(trees)
+    max_score = 0
+    for i in range(1, max_height-1):
+        for j in range(1, max_width - 1):
+            scenic_score = 1
+            current_tree = trees[i,j]
+            is_visible = False
+            up = trees[:i, j]
+            if current_tree > max(up):
+                is_visible = True
+            down = trees[i+1:, j]
+            if current_tree > max(down):
+                is_visible = True
+            right = trees[i, j+1:]
+            if current_tree > max(right):
+                is_visible = True
+            left = trees[i, :j]
+            if current_tree > max(left):
+                is_visible = True         
+            if is_visible:
+                if verbose:
+                    print(current_tree)
+                for scenic in [reversed(up), down, right, reversed(left)]:
+                    ss = 0
+                    for x in scenic:
+                        if x < current_tree:
+                            ss += 1
+                        else:
+                            ss += 1
+                            break
+                    if verbose:
+                        print('   ', ss, scenic)
+                    scenic_score = scenic_score * ss
+                if verbose:
+                    print('Total ', scenic_score)    
+                max_score = max(max_score, scenic_score)
+    return max_score
 
 
 print('\nSAMPLE INPUT')
@@ -56,9 +84,9 @@ with open('input', 'r') as f:
     input_game = f.read()
 grid_tree = load_input(input_game, verbose_cmd=False)
 print(game(grid_tree))
+
+print('\nSAMPLE INPUT 2')
+print(game2(grid_tree_sample))
+
+print(game2(grid_tree))
 # 
-# print('\nSAMPLE INPUT 2')
-# print(game2(sample_directories))
-# 
-# print(game2(directories))
-# # 
