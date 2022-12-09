@@ -12,32 +12,22 @@ def load_input(input, verbose_cmd=False, verbose=False):
 
 def game(trees, verbose=False):
     count_trees = 0
-    max_height = len(trees)
-    for i, tree_line in enumerate(trees):
-        max_width = len(tree_line)
-        for j, current_tree in enumerate(tree_line):
-            w = ((i - 1), j)
-            x = ((i+1), j)
-            a = (i, (j-1))
-            d = (i, (j +1))
-            other_trees = {'col': [w, x],  'row': [a, d]}
-            the_others = {current_tree: {'col': [],  'row': []}}
-            for pos in other_trees:
-                for pos_trees in other_trees[pos]:
-                    if pos_trees[0] < 0 or pos_trees[0] == max_width:
-                        continue
-                    if pos_trees[1] < 0 or pos_trees[1] == max_height:
-                        continue
-                    the_others[current_tree][pos].append(trees[pos_trees[0]][pos_trees[1]])                    
-            for pos, values in the_others.items():
-                if len(values['col']) < 2 or len(values['row']) < 2:
-                    count_trees += 1
-                else:
-                    if min(values['col']) < current_tree  or min(values['row']) < current_tree:
-                        print('current i,j {},{} : {} - {} - v'.format(i,j,current_tree, values))
-                        count_trees += 1
-                    else:
-                        print('current i,j {},{} : {} - {}'.format(i,j,current_tree, values))
+    max_height,max_width = np.shape(trees)
+    for i in range(1, max_height-1):
+        for j in range(1, max_width - 1):
+            current_tree = trees[i,j]
+            is_visible = False
+            if current_tree > max(trees[:i, j]):
+                is_visible = True
+            if current_tree > max(trees[i+1:, j]):
+                is_visible = True
+            if current_tree > max(trees[i, j+1:]):
+                is_visible = True
+            if current_tree > max(trees[i, :j]):
+                is_visible = True         
+            if is_visible:
+                count_trees += 1
+    count_trees += (max_height * 2) + ( (max_width -2) * 2)
     return count_trees
 
 def game2(directories, verbose=False):
